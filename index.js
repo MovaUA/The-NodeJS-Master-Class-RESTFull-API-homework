@@ -77,6 +77,10 @@ httpsServer.listen(config.httpsPort, function () {
 
 const handlers = {};
 
+handlers.ping = function (data, callback) {
+  callback(200);
+}
+
 handlers.sample = function (data, callback) {
   callback(406, { name: 'sample handler' });
 }
@@ -86,5 +90,6 @@ handlers.notFound = function (data, callback) {
 }
 
 const router = {
+  ping: handlers.ping,
   'sample': handlers.sample,
 };
