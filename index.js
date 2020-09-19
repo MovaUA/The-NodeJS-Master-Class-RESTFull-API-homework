@@ -4,11 +4,13 @@ Primary file for the API
 
 // Dependencies
 const http = require("http");
+const https = require('https');
 const url = require('url');
 const StringDecoder = require('string_decoder').StringDecoder;
+const config = require('./config');
+const fs = require('fs');
 
-// The server should responde to the requests
-const server = http.createServer(function (req, res) {
+const unifedServer = function (req, res) {
   let parsedUrl = url.parse(req.url, true);
 
   let path = parsedUrl.pathname;
@@ -54,11 +56,23 @@ const server = http.createServer(function (req, res) {
       console.log('response:', { statusCode, payload });
     });
   });
-});
+};
+
+// The server should responde to the requests
+const httpServer = http.createServer(unifedServer);
+
+const httpsServerOptions = {
+  key: fs.readFileSync(__dirname + '/https/key.pem'),
+  cert: fs.readFileSync(__dirname + '/https/cert.pem'),
+};
+const httpsServer = https.createServer(httpsServerOptions, unifedServer);
 
 // Start the server
-server.listen(3000, function () {
-  console.log("The server is listening on port 3000");
+httpServer.listen(config.httpPort, function () {
+  console.log(`The server is listening on port ${config.httpPort} in ${config.envName} environment`);
+});
+httpsServer.listen(config.httpsPort, function () {
+  console.log(`The server is listening on port ${config.httpsPort} in ${config.envName} environment`);
 });
 
 const handlers = {};
