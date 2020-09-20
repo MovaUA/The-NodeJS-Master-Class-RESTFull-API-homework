@@ -7,9 +7,10 @@ const http = require("http");
 const https = require('https');
 const url = require('url');
 const StringDecoder = require('string_decoder').StringDecoder;
-const config = require('./config');
+const config = require('./lib/config');
 const fs = require('fs');
 const handlers = require('./lib/handlers');
+const helpers = require("./lib/helpers");
 
 const unifedServer = function (req, res) {
   let parsedUrl = url.parse(req.url, true);
@@ -40,7 +41,7 @@ const unifedServer = function (req, res) {
       query,
       method,
       headers,
-      payload: buffer,
+      payload: helpers.parseJsonToObject(buffer),
     };
 
     handler(data, function (statusCode, payload) {
@@ -77,6 +78,7 @@ httpsServer.listen(config.httpsPort, function () {
 });
 
 const router = {
+  users: handlers.users,
   ping: handlers.ping,
   'sample': handlers.sample,
 };
